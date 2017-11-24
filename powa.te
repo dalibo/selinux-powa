@@ -1,12 +1,13 @@
 policy_module(powa, 1.0.0)
 
-require {
-	role unconfined_r;
-	type unconfined_t;
-}
+attribute_role powa_roles;
+roleattribute system_r powa_roles;
 
 type powa_t;
-domain_type(powa_t)
+type powa_exec_t;
+application_type(powa_t)
+init_daemon_domain(powa_t, powa_exec_t)
+role powa_roles types powa_t;
 
 type powa_log_t;
 logging_log_file(powa_log_t)
@@ -14,71 +15,35 @@ logging_log_file(powa_log_t)
 type powa_conf_t;
 files_config_file(powa_conf_t)
 
-type powa_exec_t;
-corecmd_exec_bin(powa_exec_t)
-domain_entry_file(powa_t, powa_exec_t)
-domtrans_pattern(unconfined_t, powa_exec_t, powa_t)
+type powa_tmp_t;
+files_tmp_file(powa_tmp_t)
 
-role unconfined_r types powa_t;
+allow powa_t self:capability2 block_suspend;
 allow powa_t self:tcp_socket create_stream_socket_perms;
 
-# START AUDIT2ALLOW
+allow powa_t powa_conf_t:file read_file_perms;
 
-require {
-	type powa_exec_t;
-	type powa_t;
-	type powa_conf_t;
-	class capability { dac_override dac_read_search };
-	class tcp_socket { accept bind create getattr listen setopt };
-	class file { getattr open read };
-	class capability2 block_suspend;
-	class netlink_route_socket { bind create };
-	class unix_dgram_socket { create getopt setopt };
-	class udp_socket { connect create getattr };
-	class dir { getattr search };
-}
+allow powa_t powa_tmp_t:file manage_file_perms;
+files_tmp_filetrans(powa_t, powa_tmp_t, file)
 
-#============= powa_t ==============
+kernel_read_system_state(powa_t)
 
-#!!!! This avc is allowed in the current policy
-allow powa_t powa_conf_t:file { getattr open read };
-
-#!!!! This avc is allowed in the current policy
-allow powa_t powa_exec_t:dir { getattr search };
-
-#!!!! This avc is allowed in the current policy
-allow powa_t self:capability { dac_override dac_read_search };
-
-#!!!! This avc is allowed in the current policy
-allow powa_t self:capability2 block_suspend;
-
-#!!!! This avc is allowed in the current policy
-allow powa_t self:netlink_route_socket { bind create };
-
-#!!!! This avc is allowed in the current policy
-allow powa_t self:tcp_socket { accept bind create getattr listen setopt };
-
-#!!!! This avc is allowed in the current policy
-allow powa_t self:udp_socket { connect create getattr };
-
-#!!!! This avc is allowed in the current policy
-allow powa_t self:unix_dgram_socket { create getopt setopt };
-auth_read_passwd(powa_t)
-corecmd_exec_shell(powa_t)
 corenet_tcp_bind_generic_node(powa_t)
 corenet_tcp_bind_unreserved_ports(powa_t)
 corenet_tcp_connect_postgresql_port(powa_t)
-files_manage_generic_tmp_files(powa_t)
-fs_manage_nfs_dirs(powa_t)
-gnome_list_home_config(powa_t)
-ipa_filetrans_named_content(powa_t)
-kernel_dgram_send(powa_t)
-kernel_read_system_state(powa_t)
+
+corecmd_exec_bin(powa_t)
+corecmd_exec_shell(powa_t)
+
+auth_use_nsswitch(powa_t)
+
 libs_exec_ldconfig(powa_t)
+
 miscfiles_read_certs(powa_t)
-nscd_read_pid(powa_t)
-nscd_shm_use(powa_t)
+
 postgresql_read_config(powa_t)
-rpm_exec(powa_t)
-sysnet_read_config(powa_t)
-userdom_use_inherited_user_ptys(powa_t)
+postgresql_stream_connect(powa_t)
+
+optional_policy(`
+	rpm_exec(powa_t)
+')

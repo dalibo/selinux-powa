@@ -1,1 +1,46 @@
-## <summary></summary>
+## <summary>PostgreSQL Workload Analyzer</summary>
+
+########################################
+## <summary>
+##  Execute powa in the powa domain.
+## </summary>
+## <param name="domain">
+##  <summary>
+##  Domain allowed to transition.
+##  </summary>
+## </param>
+#
+interface(`powa_domtrans',`
+    gen_require(`
+        type powa_t, powa_exec_t;
+    ')
+
+    corecmd_search_bin($1)
+    domtrans_pattern($1, powa_exec_t, powa_t)
+')
+
+########################################
+## <summary>
+##  Execute powa in the powa domain
+##  and allow the specified role
+##  the powa domain.
+## </summary>
+## <param name="domain">
+##  <summary>
+##  Domain allowed to transition.
+##  </summary>
+## </param>
+## <param name="role">
+##  <summary>
+##  Role allowed access.
+##  </summary>
+## </param>
+#
+interface(`powa_run',`
+    gen_require(`
+        attribute_role powa_roles;
+    ')
+
+    powa_domtrans($1)
+    roleattribute $2 powa_roles;
+')
