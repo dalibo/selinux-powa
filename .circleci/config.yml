@@ -1,0 +1,20 @@
+version: "2"
+
+jobs:
+  centos7:
+    working_directory: /workspace
+    docker: [{image: "centos:7"}]
+    steps:
+    - run:
+        name: Bootstrap CentOS
+        command: yum install -y git ssh
+    - checkout
+    - run:
+        name: Build RPM
+        command: ./rpm.sh
+
+workflows:
+  version: 2
+  pipeline:
+    jobs:
+    - centos7

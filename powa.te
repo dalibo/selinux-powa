@@ -1,0 +1,49 @@
+policy_module(powa, 1.0.0)
+
+attribute_role powa_roles;
+roleattribute system_r powa_roles;
+
+type powa_t;
+type powa_exec_t;
+application_type(powa_t)
+init_daemon_domain(powa_t, powa_exec_t)
+role powa_roles types powa_t;
+
+type powa_log_t;
+logging_log_file(powa_log_t)
+
+type powa_conf_t;
+files_config_file(powa_conf_t)
+
+type powa_tmp_t;
+files_tmp_file(powa_tmp_t)
+
+allow powa_t self:capability2 block_suspend;
+allow powa_t self:tcp_socket create_stream_socket_perms;
+
+allow powa_t powa_conf_t:file read_file_perms;
+
+allow powa_t powa_tmp_t:file manage_file_perms;
+files_tmp_filetrans(powa_t, powa_tmp_t, file)
+
+kernel_read_system_state(powa_t)
+
+corenet_tcp_bind_generic_node(powa_t)
+corenet_tcp_bind_unreserved_ports(powa_t)
+corenet_tcp_connect_postgresql_port(powa_t)
+
+corecmd_exec_bin(powa_t)
+corecmd_exec_shell(powa_t)
+
+auth_use_nsswitch(powa_t)
+
+libs_exec_ldconfig(powa_t)
+
+miscfiles_read_certs(powa_t)
+
+postgresql_read_config(powa_t)
+postgresql_stream_connect(powa_t)
+
+optional_policy(`
+	rpm_exec(powa_t)
+')
