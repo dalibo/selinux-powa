@@ -22,6 +22,8 @@ domtrans_pattern(unconfined_t, powa_exec_t, powa_t)
 role unconfined_r types powa_t;
 allow powa_t self:tcp_socket create_stream_socket_perms;
 
+# START AUDIT2ALLOW
+
 require {
 	type powa_exec_t;
 	type powa_t;
