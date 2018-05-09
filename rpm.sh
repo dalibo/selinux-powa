@@ -21,7 +21,7 @@ mkdir -p $topdir
 
 yum install -y rpm-build
 yum-builddep -y selinux-policy-powa.spec
-rpmbuild -ba \
+rpmbuild -bb \
     --define "_topdir ${topdir}" \
     --define "_sourcedir ${srcdir}" \
     selinux-policy-powa.spec
