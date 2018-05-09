@@ -33,3 +33,8 @@ clean:
 .PHONY: rpm
 rpm:
 	docker-compose run --rm rpm
+
+YUMLABS?=../yum-labs
+publish:
+	find rpm -name "*.rpm" | xargs -tI % mv -vf % $(YUMLABS)/rpms/CentOS7-x86_64/
+	$(MAKE) -C $(YUMLABS) push createrepos
