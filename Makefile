@@ -29,3 +29,7 @@ test:
 
 clean:
 	rm -f powa.pp
+
+.PHONY: rpm
+rpm:
+	docker-compose run --rm rpm
